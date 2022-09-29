@@ -1,5 +1,14 @@
 # instaclone-ui
 
+## Project build
+
+```
+vue add router
+npm i jquery-validation
+npm install --save axios
+npm install --save sweetalert
+```
+
 ## Project setup
 ```
 npm install
