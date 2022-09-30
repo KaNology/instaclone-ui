@@ -7,12 +7,18 @@
             </div>
             <div class="col-8">
                 <div class="row mb-3">
-                    <button type="button" class="btn btn-outline-primary">Edit Profile</button>
+                    <router-link v-if="userId == currentUserId" :to="{name: 'EditProfileView'}">
+                        <button type="button" class="btn btn-outline-primary">Edit Profile</button>
+                    </router-link>
                 </div>
                 <div class="row mb-3">
                     <h1 class="font-weight-bold">Hansford Nguyen</h1>
                 </div>
                 <div class="row btn-group-toggle text-info">
+                    <label class="col-3 btn profile-tabs font-weight-bold">
+                        <input type="radio" v-model="activeComponent" value="UserProfilePost">
+                        Posts
+                    </label>
                     <label class="col-3 btn profile-tabs font-weight-bold">
                         <input type="radio" v-model="activeComponent" value="UserProfilePhoto">
                         Photos
@@ -36,20 +42,45 @@
     </div>
 </template>
 <script>
-import UserProfilePhoto from '../../components/UserProfile/UserProfilePhoto.vue';
+import UserProfilePost from '@/components/UserProfile/UserProfilePost.vue';
+import UserProfilePhoto from '@/components/UserProfile/UserProfilePhoto.vue';
 import UserProfileVideo from '@/components/UserProfile/UserProfileVideo.vue';
+import axios from 'axios';
 export default {
     name: "UserProfileView",
+    props: ["baseURL"],
     data() {
         return {
-            id: null,
-            activeComponent: "UserProfileHeader"
+            userId: null,
+            currentUserId: null,
+            token: null,
+            user: null,
+            activeComponent: null
         };
     },
-    mounted() {
-        this.id = this.$route.params.id;
+    methods: {
+        async getProfile() {
+            await axios.get(`${this.baseURL}user/profile/${this.userId}`).then(res => {
+                this.user = res.data
+            })
+        },
+        async getCurrentUserId() {
+            // Check if the current user match with the current profile
+            await axios.get(`${this.baseURL}user/?token=${localStorage.getItem("token")}`).then(res => {
+                this.currentUserId = res.data
+            })
+        }
     },
-    components: { UserProfilePhoto, UserProfileVideo }
+    mounted() {
+        this.userId = this.$route.params.id;
+        this.getCurrentUserId();
+
+        this.activeComponent = "UserProfileHeader"
+        if (this.userId && this.currentUserId) {
+            this.getProfile()
+        }
+    },
+    components: { UserProfilePhoto, UserProfileVideo, UserProfilePost }
 }
 </script>
 <style>
@@ -63,7 +94,7 @@ export default {
     font-size: x-large;
 }
 
-.translate-enter-active,
+/* .translate-enter-active,
 .translate-leave-active {
     transition: all 0.5s ease;
 }
@@ -72,5 +103,5 @@ export default {
 .translate-leave-to {
     opacity: 0;
     transform: translateX(30px);
-}
+} */
 </style>

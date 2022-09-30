@@ -126,7 +126,6 @@ export default {
                     lastName: this.lastName,
                     password: this.password
                 }
-                console.log(`${this.baseURL}user/signup`)
 
                 axios.post(`${this.baseURL}user/signup`, newAccount).then(() => {
                     this.$router.push({ name: 'LoginView' });

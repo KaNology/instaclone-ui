@@ -1,6 +1,6 @@
 <template>
   <nav>
-    <NavBar />
+    <NavBar :baseURL="baseURL"/>
   </nav>
 
   <body style="background-color: gainsboro;">
@@ -16,7 +16,7 @@ export default {
   data() {
     return {
       baseURL: "http://localhost:8080/", // base URL for backend server
-      token: null
+      token: null,
     };
   },
   methods: {

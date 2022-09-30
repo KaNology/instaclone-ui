@@ -1,8 +1,8 @@
 <template>
-    <div class="container">
-        <h1 class="mb-4">Instaclone Login</h1>
+    <div class="container" style="background-color: white;">
+        <h1 class="mb-4 offset-4 col-4">Instaclone Login</h1>
         <form @submit.prevent="signin" class="login-form offset-md-3 col-md-6">
-            <div class="form-group row">
+            <div class="form-row form-group">
                 <div class="offset-md-1 col-md-10">
                     <input type="email" class="form-control" placeholder="Email" v-model="email"
                         v-bind:class="{'is-invalid': errors.email}" @blur="validate">
@@ -11,7 +11,7 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group row">
+            <div class="form-row form-group">
                 <div class="offset-md-1 col-md-10">
                     <input type="password" class="form-control" placeholder="Password" v-model="password"
                         v-bind:class="{'is-invalid': errors.password}" @blur="validate">
@@ -20,10 +20,12 @@
                     </div>
                 </div>
             </div>
-            <button class="btn btn-lg btn-primary" type="submit">Sign In</button>
+            <div class="form-row">
+                <button class="btn btn-lg btn-primary mx-auto" type="submit">Sign In</button>
+            </div>
         </form>
-        <router-link :to="{name: 'SignUpView'}">
-            <a href="">Create an account</a>
+        <router-link class="row" :to="{name: 'SignUpView'}">
+            <a class="mx-auto" href="">Create an account</a>
         </router-link>
     </div>
 </template>

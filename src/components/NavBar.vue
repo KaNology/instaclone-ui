@@ -16,6 +16,11 @@
                         <a class="nav-link active">Login</a>
                     </router-link>
                 </li>
+                <li class="nav-item" v-if="userId">
+                    <router-link :to="{name: 'UserProfileView', params: {id: userId}}">
+                        <a class="nav-link active">Profile</a>
+                    </router-link>
+                </li>
                 <li class="nav-item" v-if="token">
                     <a @click="logout" class="nav-link active" href="">Logout</a>
                 </li>
@@ -24,11 +29,15 @@
     </nav>
 </template>
 <script>
+import axios from 'axios';
+
 export default {
     name: "NavBar",
+    props: ["baseURL"],
     data() {
         return {
-            token: null
+            token: null,
+            userId: null
         };
     },
     methods: {
@@ -38,6 +47,12 @@ export default {
     },
     mounted() {
         this.token = localStorage.getItem("token");
+        if (this.token) {
+            // Get the user id from the token after login
+            axios.get(`${this.baseURL}user/?token=${this.token}`).then(res => {
+                this.userId = res.data
+            })
+        }
     }
 };
 </script>
