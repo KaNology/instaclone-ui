@@ -3,14 +3,24 @@
         <div class="row">
             <h2>Edit User Profile</h2>
         </div>
-        <form v-if="user" @submit="editUser" enctype="multipart/form-data">
+        <form v-if="user" @submit.prevent="editUser" enctype="multipart/form-data">
             <div class="form-row">
                 <div class="form-group offset-4 col-4">
                     <label>Avatar</label>
-                    <input type="file" class="form-control" accept="image/png, image/jpeg, image/jpg"
-                    @change="onFileChange" v-bind:class="{'is-invalid': errors.avatar}" @blur="validate">
-                    <div class="invalid-feedback">
-                        {{errors.avatar}}
+                    <div>
+                        <label class="avatar-label" for="file">
+                            <img class="avatar" :src="`data:image/png;base64,${user.avatar}`">
+                            <div class="avatar-icon">
+                                <i class="bi bi-plus-circle"></i>
+                            </div>
+                        </label>
+
+                        <input id="file" type="file" ref="uploadImage" class="avatar-input form-control"
+                            accept="image/png, image/jpeg, image/jpg" @change="onFileChange"
+                            v-bind:class="{'is-invalid': errors.avatar}" @blur="validate">
+                        <div class="invalid-feedback">
+                            {{errors.avatar}}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -91,6 +101,9 @@ export default {
         return {
             userId: null,
             user: null,
+            oldPassword: null,
+            newPassword: null,
+            passwordConf: null,
             errors: {
                 firstName: '',
                 lastName: '',
@@ -102,25 +115,25 @@ export default {
         };
     },
     methods: {
-        editUser() {
+        async editUser() {
             if (this.validate()) {
-                let newUser = {
-                    avatar: this.avatar,
-                    firstName: this.firstName,
-                    lastName: this.lastName,
-                    email: this.email,
-                    oldPassword: this.oldPassword,
-                    newPassword: this.newPassword
-                }
+                const formData = new FormData();
+                formData.append("avatar", this.user.avatar)
+                formData.append("firstName", this.user.firstName)
+                formData.append("lastName", this.user.lastName)
+                formData.append("email", this.user.email)
+                formData.append("oldPassword", this.oldPassword)
+                formData.append("newPassword", this.newPassword)
 
-                console.log(newUser)
+                await axios.post(`${this.baseURL}user/profile/${this.userId}?token=${localStorage.getItem("token")}`, formData)
+                    .then(res => console.log(res))
             }
         },
-        onFileChange(e) {
-            var files = e.target.files || e.dataTransfer.files;
+        onFileChange() {
+            let files = this.$refs.uploadImage.files;
             if (!files.length)
                 return;
-            this.avatar = files;
+            this.user.avatar = files[0];
         },
         validate() {
             let isValid = true
@@ -133,7 +146,7 @@ export default {
                 newPassword: '',
                 passwordConf: ''
             }
-            if (!this.avatar) {
+            if (!this.user.avatar) {
                 this.errors.avatar = "Please provide an avatar"
                 isValid = false
             }
@@ -187,3 +200,34 @@ export default {
     },
 }
 </script>
+<style>
+.avatar-label {
+    position: relative;
+}
+
+.avatar {
+    display: block;
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+}
+
+.avatar-icon {
+    display: block;
+    width: 200px;
+    height: 200px;
+
+    color: white;
+    text-align: center;
+    font-size: 125px;
+    background-color: black;
+    opacity: calc(50%);
+
+    top: 0px;
+    position: absolute;
+}
+
+.avatar-input {
+    display: none;
+}
+</style>
