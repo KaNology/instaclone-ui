@@ -123,8 +123,6 @@ export default {
                     formData.append("files[]", value)
                 })
 
-                console.log(...formData)
-
                 axios.post(`${this.baseURL}post/create?token=${localStorage.getItem("token")}`, formData).then(res => {
                     sweetalert({
                         text: 'Post successfully created',

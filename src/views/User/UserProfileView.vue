@@ -37,7 +37,7 @@
             </div>
         </div>
         <transition name="translate" mode="out-in">
-            <component :is="activeComponent"></component>
+            <component :baseURL="baseURL" :is="activeComponent"></component>
         </transition>
     </div>
 </template>
