@@ -3,26 +3,38 @@
         <div class="row">
             <h2>New Post</h2>
         </div>
-        <form action="">
+        <form @submit.prevent="createPost" action="">
             <div class="form-row mb-5">
                 <div class="col-6">
                     <div class="form-group">
                         <label>Title</label>
-                        <input type="text" class="form-control" placeholder="Post Title">
+                        <input v-model="title" type="text" class="form-control" placeholder="Post Title"
+                            v-bind:class="{'is-invalid': errors.title}" @blur="validate">
+                        <div class="invalid-feedback">
+                            {{errors.title}}
+                        </div>
                     </div>
                     <div class="input-group-prepend">
                         <label for="sharingmode">Sharing mode</label>
                     </div>
-                    <select class="custom-select" id="sharingmode">
+                    <select v-model="isPrivate" class="custom-select" id="sharingmode"
+                        v-bind:class="{'is-invalid': errors.isPrivate}" @blur="validate">
                         <option selected>Choose...</option>
-                        <option>Public</option>
-                        <option>Private</option>
+                        <option :value="false">Public</option>
+                        <option :value="true">Private</option>
                     </select>
+                    <div class="invalid-feedback">
+                        {{errors.isPrivate}}
+                    </div>
                 </div>
                 <div class="col-6">
                     <div class="form-group">
                         <label>Description</label>
-                        <textarea type="text" class="form-control" placeholder="Post Description"></textarea>
+                        <textarea v-model="description" type="text" class="form-control" placeholder="Post Description"
+                            v-bind:class="{'is-invalid': errors.description}" @blur="validate"></textarea>
+                        <div class="invalid-feedback">
+                            {{errors.description}}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -33,7 +45,7 @@
                     <div v-for="(image,key) in previewImages" :key="key" class="image-box col-3">
                         <img :src="image" class="image-preview">
                         <div class="image-layer">
-                            <i @click="removeImage(image)" class="image-close bi bi-x-circle"></i>
+                            <i @click="removeImage(key)" class="image-close bi bi-x-circle"></i>
                         </div>
                     </div>
                     <div class="col-3">
@@ -43,7 +55,11 @@
                             </div>
                         </label>
                         <input style="display: none;" @change="onFileChange" id="file" type="file" ref="uploadImage"
-                            class="form-control" accept="image/png, image/jpeg, image/jpg" multiple>
+                            class="form-control" accept="image/png, image/jpeg, image/jpg" multiple
+                            v-bind:class="{'is-invalid': errors.files}" @blur="validate">
+                        <div class="invalid-feedback">
+                            {{errors.files}}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -55,13 +71,26 @@
     </div>
 </template>
 <script>
+import axios from 'axios';
+import sweetalert from 'sweetalert';
+
 export default {
     name: "CreatePostView",
+    props: ["baseURL"],
     data() {
         return {
-            id: null,
+            userId: null,
+            files: [],
+            title: null,
+            description: null,
+            isPrivate: null,
             previewImages: [],
-            // active: false,
+            errors: {
+                files: null,
+                title: null,
+                description: null,
+                isPrivate: null
+            }
         };
     },
     methods: {
@@ -75,16 +104,72 @@ export default {
                 reader.onload = e => {
                     this.previewImages.push(e.target.result)
                 }
+                this.files.push(files[i])
                 reader.readAsDataURL(files[i])
             }
         },
-        removeImage(object) {
-            const filtersList = this.previewImages.filter(element => element !== object)
-            this.previewImages = filtersList
+        removeImage(index) {
+            this.previewImages.splice(index, 1)
+            this.files.splice(index, 1)
+        },
+        createPost() {
+            if (this.validate()) {
+                const formData = new FormData();
+                formData.append("title", this.title)
+                formData.append("description", this.description)
+                formData.append("isPrivate", this.isPrivate)
+
+                this.files.forEach(value => {
+                    formData.append("files[]", value)
+                })
+
+                console.log(...formData)
+
+                axios.post(`${this.baseURL}post/create?token=${localStorage.getItem("token")}`, formData).then(res => {
+                    sweetalert({
+                        text: 'Post successfully created',
+                        icon: 'success'
+                    })
+                    console.log(res)
+                }).catch(err => {
+                    sweetalert({
+                        text: 'Something\'s wrong',
+                        icon: 'error'
+                    })
+                    console.log(err)
+                })
+            }
+        },
+        validate() {
+            let isValid = true
+            this.errors = {
+                files: null,
+                title: null,
+                description: null,
+                isPrivate: null
+            }
+            if (!this.title) {
+                this.errors.title = "Please provide a title"
+                isValid = false
+            }
+            if (!this.description) {
+                this.errors.description = "Please write your description"
+                isValid = false
+            }
+            if (!this.files || this.files.length < 1) {
+                this.errors.files = "Please provide some images/videos"
+                isValid = false
+            }
+            if (this.isPrivate === null) {
+                this.errors.isPrivate = "Please choose the privacy settings"
+                isValid = false
+            }
+
+            return isValid
         }
     },
     mounted() {
-        this.id = this.$route.params.id;
+        this.userId = this.$route.params.id;
     },
     components: {}
 }
