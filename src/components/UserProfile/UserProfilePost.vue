@@ -11,7 +11,7 @@
         </div>
     </div>
 
-    <PostModal ref="popupPost"></PostModal>
+    <PostModal :baseURL="baseURL" ref="popupPost"></PostModal>
 </template>
 <script>
 import axios from 'axios';

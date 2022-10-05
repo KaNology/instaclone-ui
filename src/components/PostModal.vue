@@ -26,7 +26,18 @@
                         <p>{{content.description}}</p>
                     </div>
                     <div class="row">
-                        Comment Section
+                        <div class="comment-row mb-2" v-for="(comment, index) in content.comments" :key="index">
+                            <img class="comment-avatar mr-2" :src="`data:image/png;base64,${comment.userAvatar}`" />
+                            <div class="">
+                                <p class="mb-0"><span
+                                        class="font-weight-bold mr-2">{{comment.userName}}</span>{{comment.content}}</p>
+                                1 like
+                            </div>
+                        </div>
+                        <div class="comment-box input-group">
+                            <textarea v-model="commentContent" class="form-control" placeholder="Leave a comment..."></textarea>
+                            <i @click="addComment(content.postId)" class="bi bi-chat-right-text-fill"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -34,13 +45,17 @@
     </div>
 </template>
 <script>
+import axios from 'axios';
+
 export default {
     data() {
         return {
             content: null,
             currentIndex: 0,
+            commentContent: null
         }
     },
+    props: ["baseURL"],
     methods: {
         onClose() {
             this.hide();
@@ -69,6 +84,18 @@ export default {
             else {
                 this.currentIndex = this.content.files.length - 1;
             }
+        },
+        async addComment(postId) {
+            await axios({
+                method: 'post',
+                url: `${this.baseURL}comment/create?token=${localStorage.getItem("token")}&postId=${postId}`,
+                data: this.commentContent,
+                headers: {
+                    'Content-Type': 'text/plain'
+                }
+            }).catch(err => {
+                console.log(err)
+            })
         }
     }
 }
@@ -153,5 +180,39 @@ export default {
 .next:hover,
 .prev:hover {
     opacity: 100%;
+}
+
+.comment-row {
+    display: flex;
+}
+
+.comment-avatar {
+    display: block;
+    width: 2rem;
+    height: 2rem;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.comment-box {
+    position: relative;
+
+    i {
+        position: absolute;
+        bottom: 5px;
+        right: 15px;
+        color: dodgerblue;
+        cursor: pointer;
+        opacity: 0.5;
+        z-index: 9999;
+    }
+
+    i:hover {
+        opacity: 1;
+    }
+
+    textarea {
+        display: block;
+    }
 }
 </style>
