@@ -29,6 +29,7 @@ export default {
         async getPost() {
             await axios.get(`${this.baseURL}/post/list/${this.$route.params.id}`).then(res => {
                 this.posts = res.data;
+                console.log(res.data)
             });
         },
         showPopup(post) {

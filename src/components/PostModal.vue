@@ -122,7 +122,7 @@ export default {
 }
 
 .card-image-container img {
-    min-height: 95%;
+    height: 95%;
     min-width: 100%;
     position: absolute;
     top: -9999px;
