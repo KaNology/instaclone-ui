@@ -123,12 +123,12 @@ export default {
                     formData.append("files[]", value)
                 })
 
-                axios.post(`${this.baseURL}post/create?token=${localStorage.getItem("token")}`, formData).then(res => {
+                axios.post(`${this.baseURL}post/create?token=${localStorage.getItem("token")}`, formData).then(() => {
                     sweetalert({
                         text: 'Post successfully created',
                         icon: 'success'
                     })
-                    console.log(res)
+                    this.$router.push({ name: 'UserProfileView' });
                 }).catch(err => {
                     sweetalert({
                         text: 'Something\'s wrong',

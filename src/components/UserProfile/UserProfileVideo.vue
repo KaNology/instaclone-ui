@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <button type="button" class="btn btn-success offset-10 col-1">Add Video</button>
+        <button type="button" class="btn btn-success offset-10 mb-4">Add Video</button>
     </div>
 </template>
 <script>
