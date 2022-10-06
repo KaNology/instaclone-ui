@@ -7,7 +7,8 @@
                 <div class="col-7">
                     <transition-group class="card-image-container" name="fade" tag="div">
                         <div v-for="i in [currentIndex]" :key="i">
-                            <img :src="`data:image/png;base64,${post.files[currentIndex]}`" />
+                            <img style="object-fit: cover;"
+                                :src="`data:image/png;base64,${post.files[currentIndex]}`" />
                         </div>
                     </transition-group>
                     <a v-if="currentIndex > 0" class="prev" @click="prev" href="#"><i
@@ -25,20 +26,37 @@
                     <div class="row">
                         <p>{{post.description}}</p>
                     </div>
-                    <div class="row">
-                        <div class="comment-row mb-2" v-for="(comment, index) in post.comments" :key="index">
-                            <img class="comment-avatar mr-2" :src="`data:image/png;base64,${comment.userAvatar}`" />
+                    <div class="row mb-2">
+                        <div>
+                            <i @click="likePost(post.postId)" v-if="post.isLiked" class="bi bi-star-fill post-like"></i>
+                            <i @click="likePost(post.postId)" v-else class="bi bi-star post-like"></i>
+                        </div>
+                        <div class="col-12 p-0">
+                            {{post.numLikes}} Likes
+                        </div>
+                    </div>
+                    <div class="row mb-2" v-for="(comment, index) in post.comments" :key="index">
+                        <div class="comment-avatar col-1">
+                            <img :src="`data:image/png;base64,${comment.userAvatar}`" />
+                        </div>
+
+                        <div class="col-11">
                             <div class="">
-                                <p class="mb-0"><span
-                                        class="font-weight-bold mr-2">{{comment.userName}}</span>{{comment.content}}</p>
+                                <span class="font-weight-bold">{{comment.userName}}</span>
+                            </div>
+                            <div class="comment-content">
+                                <p class="mb-0">
+                                    {{comment.content}}
+                                </p>
                                 1 like
                             </div>
                         </div>
-                        <div class="comment-box input-group">
-                            <textarea v-model="commentContent" class="form-control" placeholder="Leave a comment..."></textarea>
-                            <i @click="addComment(post.postId)" class="bi bi-chat-right-text-fill"></i>
-                        </div>
                     </div>
+                    <!-- <div class="comment-box input-group">
+                        <textarea v-model="commentContent" class="form-control"
+                            placeholder="Leave a comment..."></textarea>
+                        <i @click="addComment(post.postId)" class="bi bi-chat-right-text-fill"></i>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -101,9 +119,18 @@ export default {
                 headers: {
                     'Content-Type': 'text/plain'
                 }
+            }).then(() => {
+                this.getPost(this.post.postId)
+                this.commentContent = ''
             }).catch(err => {
                 console.log(err)
             })
+        },
+        async likePost(postId) {
+            await axios.post(`${this.baseURL}like/likePost?token=${localStorage.getItem("token")}&postId=${postId}`)
+                .then(() => {
+                    this.getPost(this.post.postId)
+                }).catch(err => console.log(err))
         }
     }
 }
@@ -190,16 +217,24 @@ export default {
     opacity: 100%;
 }
 
-.comment-row {
-    display: flex;
+.comment-avatar {
+    position: relative;
+
+    img {
+        width: 30px;
+        height: 30px;
+        object-fit: cover;
+        border-radius: 50%;
+
+        position: absolute;
+        left: 0;
+        top: 5px;
+    }
 }
 
-.comment-avatar {
-    display: block;
-    width: 2rem;
-    height: 2rem;
-    object-fit: cover;
-    border-radius: 50%;
+.comment-content {
+    width: 100%;
+    word-break: break-all;
 }
 
 .comment-box {
@@ -222,5 +257,11 @@ export default {
     textarea {
         display: block;
     }
+}
+
+.post-like {
+    font-size: x-large;
+    cursor: pointer;
+    color: dodgerblue;
 }
 </style>
