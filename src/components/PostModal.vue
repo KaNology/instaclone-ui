@@ -3,16 +3,16 @@
     <div class="popup-modal hide" ref="popupPost">
         <span @click="onClose" class="close">X</span>
         <div class="popup-modal__wrapper">
-            <div v-if="content" class="content row">
+            <div v-if="post" class="post row">
                 <div class="col-7">
                     <transition-group class="card-image-container" name="fade" tag="div">
                         <div v-for="i in [currentIndex]" :key="i">
-                            <img :src="`data:image/png;base64,${content.files[currentIndex]}`" />
+                            <img :src="`data:image/png;base64,${post.files[currentIndex]}`" />
                         </div>
                     </transition-group>
                     <a v-if="currentIndex > 0" class="prev" @click="prev" href="#"><i
                             class="bi bi-caret-left-square-fill"></i></a>
-                    <a v-if="currentIndex < content.files.length - 1" class="next" @click="next" href="#"><i
+                    <a v-if="currentIndex < post.files.length - 1" class="next" @click="next" href="#"><i
                             class="bi bi-caret-right-square-fill"></i></a>
                 </div>
                 <div class="col-5">
@@ -20,13 +20,13 @@
                         User
                     </div>
                     <div class="row">
-                        <h4>{{content.title}}</h4>
+                        <h4>{{post.title}}</h4>
                     </div>
                     <div class="row">
-                        <p>{{content.description}}</p>
+                        <p>{{post.description}}</p>
                     </div>
                     <div class="row">
-                        <div class="comment-row mb-2" v-for="(comment, index) in content.comments" :key="index">
+                        <div class="comment-row mb-2" v-for="(comment, index) in post.comments" :key="index">
                             <img class="comment-avatar mr-2" :src="`data:image/png;base64,${comment.userAvatar}`" />
                             <div class="">
                                 <p class="mb-0"><span
@@ -36,7 +36,7 @@
                         </div>
                         <div class="comment-box input-group">
                             <textarea v-model="commentContent" class="form-control" placeholder="Leave a comment..."></textarea>
-                            <i @click="addComment(content.postId)" class="bi bi-chat-right-text-fill"></i>
+                            <i @click="addComment(post.postId)" class="bi bi-chat-right-text-fill"></i>
                         </div>
                     </div>
                 </div>
@@ -50,7 +50,7 @@ import axios from 'axios';
 export default {
     data() {
         return {
-            content: null,
+            post: null,
             currentIndex: 0,
             commentContent: null
         }
@@ -61,8 +61,8 @@ export default {
             this.hide();
             this.$emit("onClose");
         },
-        show(content) {
-            this.content = content;
+        show(postId) {
+            this.getPost(postId);
             this.currentIndex = 0;
             this.$refs.popupPost.classList.remove("hide");
         },
@@ -70,7 +70,7 @@ export default {
             this.$refs.popupPost.classList.add("hide");
         },
         next() {
-            if (this.currentIndex < this.content.files.length - 1) {
+            if (this.currentIndex < this.post.files.length - 1) {
                 this.currentIndex += 1;
             }
             else {
@@ -82,8 +82,16 @@ export default {
                 this.currentIndex -= 1;
             }
             else {
-                this.currentIndex = this.content.files.length - 1;
+                this.currentIndex = this.post.files.length - 1;
             }
+        },
+        async getPost(postId) {
+            await axios.get(`${this.baseURL}post/${postId}`).then(res => {
+                this.post = res.data
+                console.log(res.data)
+            }).catch(err => {
+                console.log(err)
+            })
         },
         async addComment(postId) {
             await axios({
@@ -132,7 +140,7 @@ export default {
         background-color: white;
         border-radius: 6px;
 
-        .content {
+        .post {
             width: 100%;
             height: 100%;
         }
