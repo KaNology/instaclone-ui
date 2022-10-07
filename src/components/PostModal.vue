@@ -23,7 +23,7 @@
                     <div class="row">
                         <h4>{{post.title}}</h4>
                     </div>
-                    <div class="row">
+                    <div class="post-description row">
                         <p>{{post.description}}</p>
                     </div>
                     <div class="row mb-2">
@@ -52,11 +52,11 @@
                             </div>
                         </div>
                     </div>
-                    <!-- <div class="comment-box input-group">
+                    <div class="comment-box input-group">
                         <textarea v-model="commentContent" class="form-control"
                             placeholder="Leave a comment..."></textarea>
                         <i @click="addComment(post.postId)" class="bi bi-chat-right-text-fill"></i>
-                    </div> -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -104,9 +104,8 @@ export default {
             }
         },
         async getPost(postId) {
-            await axios.get(`${this.baseURL}post/${postId}`).then(res => {
+            await axios.get(`${this.baseURL}post/${postId}?token=${localStorage.getItem("token")}`).then(res => {
                 this.post = res.data
-                console.log(res.data)
             }).catch(err => {
                 console.log(err)
             })
@@ -263,5 +262,9 @@ export default {
     font-size: x-large;
     cursor: pointer;
     color: dodgerblue;
+}
+
+.post-description {
+    word-break: break-all;
 }
 </style>

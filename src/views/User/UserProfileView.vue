@@ -40,7 +40,7 @@
         </div>
         <transition name="translate" mode="out-in">
             <div>
-                <UserProfilePost v-if="activeComponent == 'UserProfilePost'" :baseURL="baseURL"></UserProfilePost>
+                <UserProfilePost v-if="activeComponent == 'UserProfilePost'" :baseURL="baseURL" :userId="userId" :currentUserId="currentUserId"></UserProfilePost>
                 <UserProfilePhoto v-if="activeComponent == 'UserProfilePhoto'"></UserProfilePhoto>
                 <UserProfileVideo v-if="activeComponent == 'UserProfileVideo'"></UserProfileVideo>
             </div>

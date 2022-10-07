@@ -94,6 +94,7 @@
 </template>
 <script>
 import axios from 'axios';
+import sweetalert from 'sweetalert';
 export default {
     name: "EditProfileView",
     props: ["baseURL"],
@@ -126,7 +127,13 @@ export default {
                 formData.append("newPassword", this.newPassword)
 
                 await axios.post(`${this.baseURL}user/profile/${this.userId}?token=${localStorage.getItem("token")}`, formData)
-                    .then(res => console.log(res))
+                    .then(() => {
+                        sweetalert({
+                            text: 'Post successfully created',
+                            icon: 'success'
+                        })
+                        this.$router.push({ name: 'UserProfileView' });
+                    })
             }
         },
         onFileChange() {

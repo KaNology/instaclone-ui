@@ -1,6 +1,6 @@
 <template>
-    <div class="row">
-        <router-link class="offset-11 mb-4" :to="{name: 'CreatePostView'}">
+    <div v-if="currentUserId == userId" class="row">
+        <router-link class="offset-10 mb-4" :to="{name: 'CreatePostView'}">
             <button type="button" class="btn btn-success">Add Post</button>
         </router-link>
     </div>
@@ -19,7 +19,7 @@ import PostModal from '../PostModal.vue';
 
 export default {
     name: "UserProfilePhoto",
-    props: ["baseURL"],
+    props: ["baseURL", "userId", "currentUserId"],
     data() {
         return {
             posts: null,

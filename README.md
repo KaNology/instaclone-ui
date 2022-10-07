@@ -7,6 +7,7 @@ vue add router
 npm i jquery-validation
 npm install --save axios
 npm install --save sweetalert
+npm install --save moment 
 ```
 
 ## Project setup
