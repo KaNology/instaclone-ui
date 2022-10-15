@@ -55,7 +55,7 @@
                             </div>
                         </label>
                         <input style="display: none;" @change="onFileChange" id="file" type="file" ref="uploadImage"
-                            class="form-control" accept="image/png, image/jpeg, image/jpg" multiple
+                            class="form-control" accept="image/png, image/jpeg, image/jpg, video/mp4" multiple
                             v-bind:class="{'is-invalid': errors.files}" @blur="validate">
                         <div class="invalid-feedback">
                             {{errors.files}}

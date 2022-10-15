@@ -7,8 +7,11 @@
                 <div class="col-7">
                     <transition-group class="card-image-container" name="fade" tag="div">
                         <div v-for="i in [currentIndex]" :key="i">
-                            <img style="object-fit: cover;"
+                            <img v-if="post.fileType[currentIndex] == 'image'" style="object-fit: cover;"
                                 :src="`data:image/png;base64,${post.files[currentIndex]}`" />
+                            <video v-else ref="videoPlayer" controls>
+                                <source :src="`data:video/mp4;base64,${post.files[currentIndex]}`" type="video/mp4">
+                            </video>
                         </div>
                     </transition-group>
                     <a v-if="currentIndex > 0" class="prev" @click="prev" href="#"><i
@@ -16,10 +19,11 @@
                     <a v-if="currentIndex < post.files.length - 1" class="next" @click="next" href="#"><i
                             class="bi bi-caret-right-square-fill"></i></a>
                 </div>
-                <div class="col-5">
-                    <div class="row">
-                        User
-                    </div>
+                <div class="col-5 mt-2">
+                    <router-link class="row" :to="{name: 'UserProfileView', params: {id: post.userId}}">
+                        <img class="user-avatar mr-2" :src="`data:image/png;base64,${post.userAvatar}`" />
+                        <h5 class="font-weight-bold mt-2" style="color: mediumblue;">{{post.userName}}</h5>
+                    </router-link>
                     <div class="row">
                         <h4>{{post.title}}</h4>
                     </div>
@@ -37,13 +41,15 @@
                     </div>
                     <div class="row mb-2" v-for="(comment, index) in post.comments" :key="index">
                         <div class="comment-avatar col-1">
-                            <img :src="`data:image/png;base64,${comment.userAvatar}`" />
+                            <router-link :to="{name: 'UserProfileView', params: {id: comment.userId}}">
+                                <img :src="`data:image/png;base64,${comment.userAvatar}`" />
+                            </router-link>
                         </div>
 
                         <div class="col-11">
-                            <div class="">
+                            <router-link :to="{name: 'UserProfileView', params: {id: comment.userId}}">
                                 <span class="font-weight-bold">{{comment.userName}}</span>
-                            </div>
+                            </router-link>
                             <div class="comment-content">
                                 <p class="mb-0">
                                     {{comment.content}}
@@ -106,6 +112,7 @@ export default {
         async getPost(postId) {
             await axios.get(`${this.baseURL}post/${postId}?token=${localStorage.getItem("token")}`).then(res => {
                 this.post = res.data
+                console.log(res.data)
             }).catch(err => {
                 console.log(err)
             })
@@ -135,6 +142,22 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+video {
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.user-avatar {
+    display: block;
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
 .popup-modal {
     width: 100vw;
     height: 100vh;

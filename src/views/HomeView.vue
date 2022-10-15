@@ -1,19 +1,19 @@
 <template>
   <div class="container" style="background-color: white;">
     <div class="row">
-      <div v-for="post in posts" :key="post.postId" class="col-12 col-md-6">
-        <div class="row">
-          <div class="col-6 ">
+      <div v-for="post in posts" :key="post.postId" class="col-12 col-md-6 mb-1 mt-2">
+        <div class="post-box row">
+          <div class="col-6 p-0 pr-3">
             <div class="post-thumbnail">
-              <img :src="`data:image/png;base64,${post.thumbnail}`" />
+              <img @click="showPopup(post.postId)" :src="`data:image/png;base64,${post.thumbnail}`" />
             </div>
 
           </div>
-          <div class="col-6">
-            <div class="row">
+          <div class="col-6 p-2">
+            <router-link class="row" :to="{name: 'UserProfileView', params: {id: post.userId}}">
               <img class="user-avatar mr-2" :src="`data:image/png;base64,${post.userAvatar}`" />
               <div class="font-weight-bold" style="color: mediumblue;">{{post.userName}}</div>
-            </div>
+            </router-link>
             <div class="row font-weight-bold">
               {{post.title}}
             </div>
@@ -34,6 +34,8 @@
         </div>
       </div>
     </div>
+
+    <PostModal :baseURL="baseURL" ref="popupPost"></PostModal>
   </div>
 </template>
 
@@ -42,6 +44,7 @@
 
 import axios from 'axios';
 import moment from 'moment';
+import PostModal from '@/components/PostModal.vue';
 
 export default {
   name: 'HomeView',
@@ -55,6 +58,7 @@ export default {
     async getPosts() {
       await axios.get(`${this.baseURL}post/?token=${localStorage.getItem("token")}`).then(res => {
         this.posts = res.data
+        // console.log(res.data)
       })
     },
     async likePost(postId) {
@@ -67,16 +71,21 @@ export default {
       if (value) {
         return moment(String(value)).format('MM/DD/YYYY')
       }
+    },
+    showPopup(postId) {
+      this.$refs.popupPost.show(postId);
     }
   },
   mounted() {
     this.getPosts()
-  }
+  },
+  components: { PostModal }
 }
 </script>
 <style lang="scss" scoped>
 .post-thumbnail {
   height: 300px;
+  cursor: pointer;
 
   img {
     width: 100%;
@@ -93,9 +102,13 @@ export default {
   border-radius: 50%;
 }
 
+.post-box {
+  box-shadow: 0 0 5px 1px rgb(197, 197, 197);
+  margin: 2px;
+}
+
 .post-like-box {
   position: absolute;
-  bottom: 10px;
 }
 
 .post-like {

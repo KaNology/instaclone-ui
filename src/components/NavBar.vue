@@ -19,9 +19,8 @@
                     </router-link>
                 </li>
                 <li class="nav-item" v-if="userId">
-                    <router-link :to="{name: 'UserProfileView', params: {id: userId}}">
-                        <a class="nav-link active">Profile</a>
-                    </router-link>
+                    <a class="nav-link active"
+                        :href="$router.resolve({name: 'UserProfileView', params: {id: userId}}).href">Profile</a>
                 </li>
                 <li class="nav-item" v-if="token">
                     <a @click="logout" class="nav-link active" href="">Logout</a>
